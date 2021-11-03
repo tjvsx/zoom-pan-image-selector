@@ -1,6 +1,3 @@
-
-let zoomIntensity = 0.2;
-
 const _ctx = document.querySelector("#canvas").getContext("2d");
 
 const _fileInput = document.querySelector('#file');
@@ -22,30 +19,12 @@ function _loadFile (evt) {
     const img = document.createElement('img');
     img.src = obj;
 
-    //read file to get width and height
-    const reader = new FileReader();
-    reader.onload = function() {
-        const image = new Image();
-        image.src = reader.result;
-        image.onload = function() {
-            const width = image.width;
-            const height = image.height;
-
-            img.replaceWith(img);
-
-            img.width = width;
-            img.height = height;
-        }
-    };
-    reader.readAsDataURL(_fileInput.files[0]);
-
     // use requestAnimationFrame when doing any form of animation via javascript
-    requestAnimationFrame(draw);
-
+    window.requestAnimationFrame(draw);
     function draw(){
 
         view.canvasDefault(); // set default transform to clear screen
-        _ctx.imageSmoothingEnabled = false;
+        // _ctx.imageSmoothingEnabled = false;
         _ctx.fillStyle = "white";
         _ctx.fillRect(0, 0, w, h);
     
@@ -71,36 +50,23 @@ function _loadFile (evt) {
     }
 }
 
-
-// mouse position state
-const mouse = {
-    pos : {x : 0, y : 0},
-    worldPos : {x : 0, y : 0},
-    posLast : {x : 0, y : 0},
-    button : false,
-    overId : "",  // id of element mouse is over
-    dragging : false,
-    whichWheel : -1, // first wheel evt will get the wheel
-    wheel : 0,
-}
-
 // zoom and pan
 const view = (()=>{
-    const m = [1,0,0,1,0,0]; // matrix: current view transform
-    const im = [1,0,0,1,0,0]; // inverse-matrix: current inverse view transform
-    let scale = 1;   // initial scale
+    const m = [1,0,0,1,0,0];    // matrix: current view transform
+    const im = [1,0,0,1,0,0];   // inverse-matrix: current inverse view transform
+    let scale = 1;              // initial scale
     const bounds = {
         top : 0,
         left : 0,
         right : w,
         bottom : h,
     }
-    let useConstraint = true; // keep bounds within current context
+    let useConstraint = true;   // keep bounds within current context
     
     let maxScale = 1;
-    const wp1 = {x :0, y : 0}; //workpoint1
-    const wp2 = {x :0, y : 0}; //workpoint2
-    const pos = {     // current position of origin
+    const wp1 = {x :0, y : 0};  //workpoint1
+    const wp2 = {x :0, y : 0};  //workpoint2
+    const pos = {               // current position of origin
         x : 0,
         y : 0,
     }
@@ -190,12 +156,22 @@ const view = (()=>{
 })();
 // view.setBounds(0,0,width,height)
 
+// mouse position state
+const mouse = {
+    pos : {x : 0, y : 0},
+    worldPos : {x : 0, y : 0},
+    posLast : {x : 0, y : 0},
+    button : false,
+    overId : "",                // id of element mouse is over
+    dragging : false,
+    whichWheel : -1,            // first wheel evt will get the wheel
+    wheel : 0,
+}
 
 //read mouse events
 // allows mouseup evt to be heard no matter where mouse has moved to
 "mousemove,mousedown,mouseup,mousewheel,wheel,DOMMouseScroll".split(",")
     .forEach(eventName=>document.addEventListener(eventName,mouseEvent));
-
 function mouseEvent (evt){
     mouse.overId = evt.target.id;
     if(evt.target.id === "canvas" || mouse.dragging){ // only interested in canvas mouse events including drag evt started on the canvas.
@@ -227,7 +203,7 @@ function mouseEvent (evt){
 
         if(mouse.wheel !== 0){
             // evt.preventDefault();
-            view.scaleAt(mouse.pos, Math.exp((mouse.wheel / 120) *zoomIntensity));
+            view.scaleAt(mouse.pos, Math.exp((mouse.wheel / 120) * 0.2)); //zoom intensity = 0.2
             mouse.wheel = 0;
         }
     }
